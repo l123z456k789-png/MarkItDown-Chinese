@@ -1,0 +1,2 @@
+# Pinned for the portable Windows release build.
+markitdown[all]==0.1.7

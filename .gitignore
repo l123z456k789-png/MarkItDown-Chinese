@@ -1,5 +1,7 @@
 .venv/
 output/
+dist/
+build/
 
 # Python
 __pycache__/

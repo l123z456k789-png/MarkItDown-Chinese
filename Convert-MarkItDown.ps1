@@ -6,9 +6,16 @@
 
 $ErrorActionPreference = 'Continue'
 
-$root     = $PSScriptRoot
-$python   = Join-Path $root '.venv\Scripts\python.exe'
-$outDir   = Join-Path $root 'output'
+$root          = $PSScriptRoot
+$runtimePython = Join-Path $root 'runtime\python.exe'
+$venvPython    = Join-Path $root '.venv\Scripts\python.exe'
+$outDir        = Join-Path $root 'output'
+
+if (Test-Path -LiteralPath $runtimePython -PathType Leaf) {
+    $python = $runtimePython
+} else {
+    $python = $venvPython
+}
 $interval = 4
 
 function Exit-WithPrompt([int]$code) {
@@ -20,7 +27,8 @@ function Exit-WithPrompt([int]$code) {
 }
 
 if (-not (Test-Path -LiteralPath $python -PathType Leaf)) {
-    Write-Host ('[错误] 找不到虚拟环境 Python：' + $python)
+    Write-Host ('[错误] 找不到可用的 Python 运行环境：' + $python)
+    Write-Host '便携版请确认 runtime\python.exe 存在；源码版请先创建 .venv。'
     Exit-WithPrompt 2
 }
 

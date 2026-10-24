@@ -2,11 +2,14 @@
 setlocal EnableExtensions
 title MarkItDown
 set "ROOT=%~dp0"
-set "VENV=%ROOT%.venv"
-set "MD=%VENV%\Scripts\markitdown.exe"
+set "PY=%ROOT%runtime\python.exe"
 
-if not exist "%MD%" goto missing
+if exist "%PY%" goto ready
 
+set "PY=%ROOT%.venv\Scripts\python.exe"
+if not exist "%PY%" goto missing
+
+:ready
 if not "%~1"=="" goto drag
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%ROOT%Interactive-MarkItDown.ps1"
@@ -28,10 +31,12 @@ exit /b 0
 
 :missing
 echo.
-echo [ERROR] markitdown.exe not found:
-echo   %MD%
+echo [ERROR] MarkItDown runtime not found:
+echo   %ROOT%runtime\python.exe
+echo   %ROOT%.venv\Scripts\python.exe
 echo.
-echo Fix it by running these commands in this folder:
+echo Portable package: re-extract the release ZIP.
+echo Source package: run these commands in this folder:
 echo   python -m venv .venv
 echo   .venv\Scripts\python.exe -m pip install "markitdown[all]"
 echo.

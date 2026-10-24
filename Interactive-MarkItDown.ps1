@@ -95,12 +95,18 @@ while ($true) {
     }
 
     if ($lower -eq 'cli') {
-        $venv = Join-Path $root '.venv'
-        $env:VIRTUAL_ENV = $venv
-        $env:PATH = (Join-Path $venv 'Scripts') + ';' + $env:PATH
+        $runtime = Join-Path $root 'runtime'
+        if (Test-Path -LiteralPath (Join-Path $runtime 'python.exe') -PathType Leaf) {
+            Remove-Item Env:VIRTUAL_ENV -ErrorAction SilentlyContinue
+            $env:PATH = $runtime + ';' + $env:PATH
+        } else {
+            $venv = Join-Path $root '.venv'
+            $env:VIRTUAL_ENV = $venv
+            $env:PATH = (Join-Path $venv 'Scripts') + ';' + $env:PATH
+        }
         $env:PROMPT = '(markitdown) $P$G'
         Write-Host ''
-        Write-Host '进入官方 MarkItDown CLI（.venv 已激活）。输入 exit 返回。'
+        Write-Host '进入官方 MarkItDown CLI（运行环境已加入 PATH）。输入 exit 返回。'
         Write-Host ''
         & cmd.exe /k
         Write-Host ''

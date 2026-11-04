@@ -171,14 +171,14 @@ class WrapperTests(unittest.TestCase):
     # ------------------------------------------------------------------
 
     def test_version_labels(self):
-        self.assertEqual(mw.WRAPPER_VERSION, "v0.2.0 (AI Enhanced)")
+        self.assertEqual(mw.WRAPPER_VERSION, "v0.2.1 (AI Enhanced)")
         readme = (ROOT / "README.md").read_text(encoding="utf-8-sig")
         interactive = (ROOT / "Interactive-MarkItDown.ps1").read_text(
             encoding="utf-8-sig"
         )
         convert = (ROOT / "Convert-MarkItDown.ps1").read_text(encoding="utf-8-sig")
         for text in (readme, interactive, convert):
-            self.assertIn("v0.2.0 (AI Enhanced)", text)
+            self.assertIn("v0.2.1 (AI Enhanced)", text)
         self.assertIn("0.1.7", readme)
         self.assertIn("0.1.7", interactive)
         self.assertIn("0.1.7", convert)

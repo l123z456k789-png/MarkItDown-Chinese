@@ -1,4 +1,4 @@
-# MarkItDown-Chinese v0.2.0 (AI Enhanced)
+# MarkItDown-Chinese v0.2.1 (AI Enhanced)
 
 > 基于 Microsoft 开源 MarkItDown 0.1.7 的 Windows 中文外壳。非官方项目，与 Microsoft 无隶属关系。
 

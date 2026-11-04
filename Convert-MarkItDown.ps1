@@ -105,7 +105,7 @@ while (Test-Path -LiteralPath $outPath) {
 }
 
 Write-Host '========================================'
-Write-Host 'MarkItDown-Chinese v0.2.0 (AI Enhanced)'
+Write-Host 'MarkItDown-Chinese v0.2.1 (AI Enhanced)'
 Write-Host ('输入文件：' + $src.FullName)
 Write-Host ('输出文件：' + $outPath)
 Write-Host '========================================'

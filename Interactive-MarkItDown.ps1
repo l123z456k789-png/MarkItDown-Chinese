@@ -81,7 +81,7 @@ function Show-Formats {
 }
 
 Write-Host '============================================================'
-Write-Host ' MarkItDown-Chinese v0.2.0 (AI Enhanced)'
+Write-Host ' MarkItDown-Chinese v0.2.1 (AI Enhanced)'
 Write-Host ' Powered by Microsoft MarkItDown 0.1.7'
 Write-Host '============================================================'
 Write-Host ''

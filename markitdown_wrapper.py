@@ -34,7 +34,7 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 ROOT = Path(__file__).resolve().parent
 CONFIG_PATH = ROOT / "config.json"
 OUTPUT_DIR = ROOT / "output"
-WRAPPER_VERSION = "v0.2.0 (AI Enhanced)"
+WRAPPER_VERSION = "v0.2.1 (AI Enhanced)"
 
 IMAGE_EXTENSIONS = {
     ".jpg",

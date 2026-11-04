@@ -1,0 +1,89 @@
+# MarkItDown-Chinese 的可选本地 AI 服务。
+#
+# 这个文件与主工具解耦：不启动它，MarkItDown-Chinese 仍然完全离线可用。
+# 启动后，在 config.json 里填入下面的地址即可启用 OCR / TTS。
+#
+# 前置条件：
+#   - NVIDIA GPU（建议 >= 16GB 显存；OCR 0.8B + TTS 1.7B）
+#   - Docker Desktop（WSL2 后端）或 Linux + NVIDIA Container Toolkit
+#
+# 常用命令：
+#   docker compose -f ai-server-docker-compose.yml up -d
+#   docker compose -f ai-server-docker-compose.yml logs -f
+#   docker compose -f ai-server-docker-compose.yml down
+#
+# 模型缓存保存在 ./.hf-cache，不会写进 Git。
+# 显存不足时，先注释掉其中一个服务，或把 TTS 换成 0.6B 模型：
+#   Qwen/Qwen3-TTS-12Hz-0.6B-CustomVoice
+
+name: markitdown-ai
+
+services:
+  # Xiaomi-OCR-0：OpenAI 兼容 Vision API
+  # 接口：POST http://127.0.0.1:8000/v1/chat/completions
+  # 如果启动时报 trust_remote_code，在 command 里补 --trust-remote-code。
+  ocr:
+    image: vllm/vllm-openai:v0.32.0
+    container_name: xiaomi-ocr-0
+    command:
+      - xiaomi-research/Xiaomi-OCR-0
+      - --served-model-name
+      - Xiaomi-OCR-0
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --gpu-memory-utilization
+      - "0.35"
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - ./.hf-cache:/root/.cache/huggingface
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    ipc: host
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Qwen3-TTS：OpenAI 兼容 /v1/audio/speech
+  # 接口：POST http://127.0.0.1:8091/v1/audio/speech
+  tts:
+    image: vllm/vllm-omni:v0.32.0
+    container_name: qwen3-tts
+    working_dir: /app/vllm-omni
+    command:
+      - vllm
+      - serve
+      - Qwen/Qwen3-TTS-12Hz-1.7B-CustomVoice
+      - --deploy-config
+      - vllm_omni/deploy/qwen3_tts.yaml
+      - --omni
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8091"
+      - --trust-remote-code
+      - --enforce-eager
+      - --stage-overrides
+      - '{"0":{"max_num_seqs":4,"gpu_memory_utilization":0.2},"1":{"max_num_seqs":4,"gpu_memory_utilization":0.2}}'
+    ports:
+      - "127.0.0.1:8091:8091"
+    volumes:
+      - ./.hf-cache:/root/.cache/huggingface
+    environment:
+      HF_TOKEN: ${HF_TOKEN:-}
+    ipc: host
+    restart: unless-stopped
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]

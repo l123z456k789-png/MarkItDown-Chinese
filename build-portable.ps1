@@ -16,6 +16,16 @@ if (-not (Test-Path -LiteralPath (Join-Path $venvSite 'markitdown'))) {
     throw "markitdown is not installed in .venv. Run: .venv\Scripts\python.exe -m pip install -r requirements-portable.txt"
 }
 
+# Run tests before touching dist; abort the build on failure.
+$tests = Join-Path $root 'tests'
+if (-not (Test-Path -LiteralPath $tests -PathType Container)) {
+    throw "Missing tests directory: $tests"
+}
+& $venvPython -m unittest discover -s $tests -p 'test_*.py'
+if ($LASTEXITCODE -ne 0) {
+    throw "Unit tests failed. Build aborted."
+}
+
 if (-not $PythonHome) {
     $PythonHome = (& $venvPython -c "import sys; print(sys.base_prefix)" 2>&1).Trim()
 }
@@ -93,7 +103,10 @@ $bundleFiles = @(
     'README.md',
     'LICENSE',
     'Interactive-MarkItDown.ps1',
-    'Convert-MarkItDown.ps1'
+    'Convert-MarkItDown.ps1',
+    'markitdown_wrapper.py',
+    'ai-server-docker-compose.yml',
+    'config.example.json'
 )
 foreach ($name in $bundleFiles) {
     $source = Join-Path $root $name
@@ -124,6 +137,10 @@ if ($LASTEXITCODE -ne 0) {
 & $runtimePython -m markitdown --help > $null 2>&1
 if ($LASTEXITCODE -ne 0) {
     throw "Portable markitdown CLI check failed with exit code $LASTEXITCODE"
+}
+& $runtimePython -c "import pypdfium2, PIL" > $null 2>&1
+if ($LASTEXITCODE -ne 0) {
+    throw "Portable runtime cannot import pypdfium2/Pillow (OCR fallback)."
 }
 
 if (Test-Path -LiteralPath $zipPath) {

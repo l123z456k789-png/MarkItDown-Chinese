@@ -1,2 +1,5 @@
 # Pinned for the portable Windows release build.
 markitdown[all]==0.1.7
+# Used only by the optional OCR fallback (PDF page rendering).
+pypdfium2>=5,<6
+Pillow>=10

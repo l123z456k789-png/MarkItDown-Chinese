@@ -9,6 +9,7 @@ $ErrorActionPreference = 'Continue'
 $root          = $PSScriptRoot
 $runtimePython = Join-Path $root 'runtime\python.exe'
 $venvPython    = Join-Path $root '.venv\Scripts\python.exe'
+$wrapper       = Join-Path $root 'markitdown_wrapper.py'
 $outDir        = Join-Path $root 'output'
 
 if (Test-Path -LiteralPath $runtimePython -PathType Leaf) {
@@ -104,7 +105,7 @@ while (Test-Path -LiteralPath $outPath) {
 }
 
 Write-Host '========================================'
-Write-Host 'MarkItDown'
+Write-Host 'MarkItDown-Chinese v0.2.0 (AI Enhanced)'
 Write-Host ('输入文件：' + $src.FullName)
 Write-Host ('输出文件：' + $outPath)
 Write-Host '========================================'
@@ -112,7 +113,12 @@ Write-Host ''
 Write-Host '正在转换，请勿关闭窗口...'
 Write-Host ''
 
-$argLine = '-m markitdown "' + $src.FullName + '" -o "' + $outPath + '"'
+if (Test-Path -LiteralPath $wrapper -PathType Leaf) {
+    $argLine = '"' + $wrapper + '" "' + $src.FullName + '" -o "' + $outPath + '"'
+} else {
+    # 包装器缺失时保持原版行为。
+    $argLine = '-m markitdown "' + $src.FullName + '" -o "' + $outPath + '"'
+}
 $sw = [Diagnostics.Stopwatch]::StartNew()
 $psi = New-Object Diagnostics.ProcessStartInfo
 $psi.FileName = $python
